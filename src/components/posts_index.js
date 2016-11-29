@@ -12,8 +12,8 @@ class PostsIndex extends Component {
   renderPosts() {
     return this.props.posts.map((post) => {
       return (
-        <Link to={ "posts/" + post.id }>
-          <li className="list-group-item" key={post.id}>
+        <Link to={ "posts/" + post.id } key={ post.id }>
+          <li className="list-group-item">
               <strong>{ post.title }</strong>
               <span className="post-category">{ post.categories }</span>
           </li>
