@@ -2,6 +2,11 @@
   margin: 5px;
 }
 
+.btn-right {
+  float: right;
+}
+
+
 .post-category {
   float: right;
 }
