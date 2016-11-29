@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { fetchPosts } from '../actions/index'
+import { Link } from 'react-router'
 
 class PostsIndex extends Component {
   componentWillMount() {
@@ -10,16 +11,21 @@ class PostsIndex extends Component {
 
   render() {
     return (
-      <div>List of blog posts</div>
+      <div>
+        <div className="text-xs-right">
+          <Link to="/posts/new" className="btn btn-primary">Add a post</Link>
+        </div>
+        List of blog posts
+      </div>
     )
   }
 }
-
-// In ES6, it's possible to skip this step of writing this function and just do this in the export:
-// export default connect(null, { fetchPosts })(PostsIndex)
 
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({ fetchPosts }, dispatch)
 }
 
 export default connect(null, mapDispatchToProps)(PostsIndex)
+
+// In ES6, it's possible to skip this step of writing the mapDispatchToProps function and just write the export as the following:
+// export default connect(null, { fetchPosts })(PostsIndex)
