@@ -1,15 +1,31 @@
-import React, { Component } from 'react'
+import React, { Component, PropTypes } from 'react'
 import { reduxForm } from 'redux-form'
 import { createPost } from '../actions/index'
 import { Link } from 'react-router'
 
 class PostsNew extends Component {
+
+  // get access to the router to be able to redirect to the rooth path when a post is sucessfully created
+  static contextTypes = {
+    router: PropTypes.object
+  }
+
+  // whenever handleSubmit is called, this function will be called and pass the properties of the form
+  onSubmit(props) {
+    this.props.createPost(props)
+      .then(() => {
+        // blog post has been created, navigate the user to the index
+        // we navigate by calling this.context.router.push with the new path to navigate to.
+        this.context.router.push('/')
+      })
+  }
+
   render() {
     // handleSubmit is coming from the reduxForm library
     const { fields: { title, categories, content }, handleSubmit } = this.props
 
     return (
-      <form onSubmit={ handleSubmit(this.props.createPost) }>
+      <form onSubmit={ handleSubmit(this.onSubmit.bind(this)) }>
         <h3>Create New Post</h3>
         <div className={ `form-group ${title.touched && title.invalid ? 'has-danger' : '' }` }>
           <label>Title</label>
