@@ -1,55 +1,32 @@
 import _ from 'lodash'
-import React, { Component, PropTypes } from 'react'
-import { reduxForm } from 'redux-form'
-import { createPost } from '../actions/index'
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { Field, reduxForm } from 'redux-form'
 import { Link } from 'react-router-dom'
 
-const FIELDS = {
-  title: {
-    type: 'input',
-    label: 'Title for post'
-   },
-  categories: {
-    type: 'input',
-    label: 'Enter some categories'
-  },
-  content: {
-    type: 'textarea',
-    label: 'Post Contents'
- }
-}
-
-// ['title', 'categories', 'content']
+import { createPost } from '../actions/index'
 
 class PostsNew extends Component {
+  renderField(field) {
+    const {
+      meta: { touched, error }
+    } = field
 
-  // get access to the router to be able to redirect to the rooth path when a post is sucessfully created
-  static contextTypes = {
-    router: PropTypes.object
-  }
-
-  renderField(fieldConfig, field) {
-    const fieldHelper = this.props.fields[field]
+    const className = `form-control ${touched && error ? 'is-invalid' : ''}`
 
     return (
-      <div key={ fieldConfig.label } className={ `form-group ${fieldHelper.touched && fieldHelper.invalid ? 'has-danger' : '' }` }>
-        <label>{ fieldConfig.label }</label>
-        <fieldConfig.type className="form-control" { ...fieldHelper } />
-        <div className="text-help form-control-label">
-          { fieldHelper.touched ? fieldHelper.error : null }
-        </div>
+      <div className="form-group">
+        <label>{field.label}</label>
+        <input className={className} type="input" {...field.input} />
+        <div className="invalid-feedback">{touched ? error : null}</div>
       </div>
     )
   }
 
-  // whenever handleSubmit is called, this function will be called and pass the properties of the form
-  onSubmit(props) {
-    this.props.createPost(props)
-      .then(() => {
-        // blog post has been created, navigate the user to the index
-        // we navigate by calling this.context.router.push with the new path to navigate to.
-        this.context.router.push('/')
-      })
+  onSubmit(values) {
+    this.props.createPost(values, () => {
+      this.props.history.push('/')
+    })
   }
 
   render() {
@@ -57,13 +34,22 @@ class PostsNew extends Component {
     const { handleSubmit } = this.props
 
     return (
-      <form onSubmit={ handleSubmit(this.onSubmit.bind(this)) }>
-        <h3>Create New Post</h3>
+      <form onSubmit={handleSubmit(this.onSubmit.bind(this))}>
+        <h3>Create post</h3>
+        <Field label="Title" name="title" component={this.renderField} />
+        <Field
+          label="Categories"
+          name="categories"
+          component={this.renderField}
+        />
+        <Field label="Content" name="content" component={this.renderField} />
 
-        { _.map(FIELDS, this.renderField.bind(this)) }
-
-        <button type="submit" className="btn btn-primary">Submit</button>
-        <Link to="/" className="btn btn-danger">Cancel</Link>
+        <button type="submit" className="btn btn-primary">
+          Submit
+        </button>
+        <Link to="/" className="btn btn-danger">
+          Cancel
+        </Link>
       </form>
     )
   }
@@ -72,21 +58,28 @@ class PostsNew extends Component {
 function validate(values) {
   const errors = {}
 
-  _.each(FIELDS, (type, field) => {
-    if (!values[field]) {
-      errors[field] = `${field} is required.`
-    }
-  })
+  // validate the inputs from 'values'
+  if (!values.title) {
+    errors.title = 'Enter a title'
+  }
+  if (!values.categories) {
+    errors.categories = 'Enter some categories'
+  }
+  if (!values.content) {
+    errors.content = 'Enter some content'
+  }
 
+  // if errors is empty, the form is fine to Submit,
+  // if errors has *any* properties, redux form assumes form is invalid
   return errors
 }
 
-// reduxForm can be used as a connect
-// connect: first argument is mapStateToProps, second is mapDispatchToProps
-// reduxForm: first is form config, second is mapStateToProps, third is mapDispatchToProps
-
 export default reduxForm({
-  // "Letter" that we are passing off to reduxForm
-  form: 'PostsNew',
-  fields: _.keys(FIELDS), validate
-}, null, { createPost })(PostsNew)
+  validate,
+  form: 'PostsNewForm'
+})(
+  connect(
+    null,
+    { createPost }
+  )(PostsNew)
+)
