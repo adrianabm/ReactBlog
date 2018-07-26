@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { fetchPost, deletePost } from '../actions/index'
-import { Link } from 'react-router'
+import { Link } from 'react-router-dom'
 
 class PostsShow extends Component {
   static contextTypes = {

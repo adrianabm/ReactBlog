@@ -2,7 +2,7 @@ import _ from 'lodash'
 import React, { Component, PropTypes } from 'react'
 import { reduxForm } from 'redux-form'
 import { createPost } from '../actions/index'
-import { Link } from 'react-router'
+import { Link } from 'react-router-dom'
 
 const FIELDS = {
   title: {
